@@ -2,7 +2,7 @@
 
 **Группа/Группа N** (укажите вашу группу)
 
-**Дата выполнения:** (укажите дату)
+**Дата выполнения:** (10,06,2026)
 
 
 ### Инструкция по выполнению домашнего задания
@@ -52,61 +52,27 @@ ansible-playbook -i inventory.ini playbook/playbook_motd.yml
 ```
 
 **Выполнение плейбука playbook_archive.yml:**
-```
-PLAY [Download and extract Apache Kafka] ***************************************
 
-TASK [Create destination directory] ********************************************
-changed: [localhost]
-
-TASK [Download Kafka archive] **************************************************
-changed: [localhost]
-
-TASK [Extract archive] *********************************************************
-changed: [localhost]
-
-PLAY RECAP *********************************************************************
-localhost                  : ok=3    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-```
+![Вывод плейбука archive](img/screenshot_archive.png)
 
 **Выполнение плейбука playbook_tuned.yml:**
-```
-PLAY [Install and enable tuned] ************************************************
 
-TASK [Gathering Facts] *********************************************************
-ok: [localhost]
-
-TASK [Install tuned package] ***************************************************
-changed: [localhost]
-
-TASK [Start and enable tuned service] ******************************************
-changed: [localhost]
-
-PLAY RECAP *********************************************************************
-localhost                  : ok=3    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-```
+![Вывод плейбука tuned](img/screenshot_tuned.png)
 
 **Выполнение плейбука playbook_motd.yml:**
-```
-PLAY [Set custom MOTD] *********************************************************
 
-TASK [Gathering Facts] *********************************************************
-ok: [localhost]
+![Вывод плейбука motd](img/screenshot_motd.png)
 
-TASK [Write custom MOTD] *******************************************************
-changed: [localhost]
+**Результат - содержимое /etc/motd:**
 
-PLAY RECAP *********************************************************************
-localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-```
-
-![Содержимое файла motd после выполнения](img/motd_result.png)
+![Содержимое MOTD](img/screenshot_motd_result.png)
 
 
 ---
 
 ### Задание 2
 
-`Модифицирован плейбук playbook_motd.yml для отображения IP-адреса, hostname и пожелания системному администратору.`
+**Модифицирован плейбук `playbook/playbook_motd.yml` для отображения IP-адреса, hostname и пожелания системному администратору.**
 
 **Изменения:**
 - Добавлены переменные Ansible facts для получения IP-адреса и hostname
@@ -138,40 +104,28 @@ localhost                  : ok=2    changed=1    unreachable=0    failed=0    s
 ```
 
 **Выполнение плейбука:**
-```
-$ ansible-playbook -i inventory.ini playbook/playbook_motd.yml
 
-PLAY [Set custom MOTD with system info] ****************************************
-
-TASK [Gathering Facts] *********************************************************
-ok: [localhost]
-
-TASK [Write custom MOTD] *******************************************************
-changed: [localhost]
-
-PLAY RECAP *********************************************************************
-localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-```
+![Вывод плейбука MOTD (Задание 2)](img/screenshot_motd.png)
 
 **Результат в /etc/motd:**
 ```
 $ cat /etc/motd
 ========================================
-IP-адрес: 192.168.1.100
-Hostname: myserver
+IP-адрес: 192.168.1.51
+Hostname: dom
 
 Доброго дня, системный администратор!
 ========================================
 ```
 
-![Содержимое MOTD](img/motd_result.png)
+![Результат MOTD](img/screenshot_motd_result.png)
 
 
 ---
 
 ### Задание 3
 
-`Создана роль webserver для установки и настройки Apache веб-сервера.`
+**Создана роль `webserver` для установки и настройки Apache веб-сервера.**
 
 **Структура роли:**
 ```
@@ -275,39 +229,22 @@ roles/webserver/
 ```
 
 **Выполнение плейбука:**
+
+![Вывод плейбука webserver](img/screenshot_webserver.png)
+
+**Результат - веб-страница Apache:**
+
+![Веб-страница с системной информацией](img/screenshot_webpage.png)
+
+**Архив с ролью:** [webserver-role.tar.gz](webserver-role.tar.gz)
+
+Проверка доступности веб-сайта (статус 200):
 ```
-$ ansible-playbook -i inventory.ini playbook/playbook_webserver.yml
-
-PLAY [Deploy Apache web server with custom homepage] ***************************
-
-TASK [Gathering Facts] *********************************************************
-ok: [localhost]
-
-TASK [webserver : Install Apache web server] ***********************************
-changed: [localhost]
-
-TASK [webserver : Create document root directory] ******************************
-ok: [localhost]
-
-TASK [webserver : Deploy index.html template] **********************************
-changed: [localhost]
-
-TASK [webserver : Ensure Apache is running and enabled] ************************
-changed: [localhost]
-
-TASK [webserver : Verify Apache is accessible] *********************************
-ok: [localhost]
-
-PLAY RECAP *********************************************************************
-localhost                  : ok=5    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+$ curl -I http://127.0.0.1
+HTTP/1.1 200 OK
+Date: Tue, 09 Jun 2026 21:13:06 GMT
+Server: Apache/2.4.66 (Ubuntu)
 ```
-
-**Архив с ролью:**
-```bash
-tar -czvf webserver-role.tar.gz roles/webserver/
-```
-
-![Проверка веб-страницы](img/webserver_result.png)
 
 ### Задание 4
 
