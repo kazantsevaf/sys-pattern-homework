@@ -1,0 +1,23 @@
+---
+galaxy_info:
+  author: Алексей Казанцев
+  description: Роль для установки и настройки Apache веб-сервера
+  company: Netology
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+  galaxy_tags:
+    - web
+    - apache
+    - httpd
+    - server
+
+dependencies: []

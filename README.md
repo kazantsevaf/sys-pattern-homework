@@ -102,50 +102,208 @@ localhost                  : ok=2    changed=1    unreachable=0    failed=0    s
 
 ### Задание 2
 
-`Приведите ответ в свободной форме........`
+`Модифицирован плейбук playbook_motd.yml для отображения IP-адреса, hostname и пожелания системному администратору.`
 
-1. `Заполните здесь этапы выполнения, если требуется ....`
-2. `Заполните здесь этапы выполнения, если требуется ....`
-3. `Заполните здесь этапы выполнения, если требуется ....`
-4. `Заполните здесь этапы выполнения, если требуется ....`
-5. `Заполните здесь этапы выполнения, если требуется ....`
-6. 
+**Изменения:**
+- Добавлены переменные Ansible facts для получения IP-адреса и hostname
+- Добавлено приветствие для системного администратора
 
+```yaml
+---
+- name: Set custom MOTD with system info
+  hosts: localhost
+  become: yes
+  gather_facts: yes
+  vars:
+    motd_message: |
+      ========================================
+      IP-адрес: {{ ansible_default_ipv4.address | default('N/A') }}
+      Hostname: {{ ansible_hostname }}
+
+      Доброго дня, системный администратор!
+      ========================================
+  tasks:
+    - name: Write custom MOTD
+      ansible.builtin.copy:
+        dest: /etc/motd
+        content: |
+          {{ motd_message }}
+        owner: root
+        group: root
+        mode: '0644'
 ```
-Поле для вставки кода...
-....
-....
-....
-....
+
+**Выполнение плейбука:**
+```
+$ ansible-playbook -i inventory.ini playbook/playbook_motd.yml
+
+PLAY [Set custom MOTD with system info] ****************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [Write custom MOTD] *******************************************************
+changed: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота 2](ссылка на скриншот 2)`
+**Результат в /etc/motd:**
+```
+$ cat /etc/motd
+========================================
+IP-адрес: 192.168.1.100
+Hostname: myserver
+
+Доброго дня, системный администратор!
+========================================
+```
+
+![Содержимое MOTD](img/motd_result.png)
 
 
 ---
 
 ### Задание 3
 
-`Приведите ответ в свободной форме........`
+`Создана роль webserver для установки и настройки Apache веб-сервера.`
 
-1. `Заполните здесь этапы выполнения, если требуется ....`
-2. `Заполните здесь этапы выполнения, если требуется ....`
-3. `Заполните здесь этапы выполнения, если требуется ....`
-4. `Заполните здесь этапы выполнения, если требуется ....`
-5. `Заполните здесь этапы выполнения, если требуется ....`
-6. 
-
+**Структура роли:**
 ```
-Поле для вставки кода...
-....
-....
-....
-....
+roles/webserver/
+├── defaults/
+│   └── main.yml          # Переменные по умолчанию
+├── handlers/
+│   └── main.yml          # Handler для перезапуска Apache
+├── meta/
+│   └── main.yml          # Метаданные роли
+├── tasks/
+│   └── main.yml          # Основные задачи
+└── templates/
+    └── index.html.j2     # Шаблон страницы с системной информацией
 ```
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота](ссылка на скриншот)`
+**playbook_webserver.yml:**
+```yaml
+---
+- name: Deploy Apache web server with custom homepage
+  hosts: localhost
+  become: yes
+  roles:
+    - webserver
+```
+
+**tasks/main.yml:**
+```yaml
+---
+- name: Install Apache web server
+  ansible.builtin.package:
+    name: "{{ apache_package }}"
+    state: present
+
+- name: Create document root directory
+  ansible.builtin.file:
+    path: "{{ apache_document_root }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy index.html template
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ apache_document_root }}/index.html"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart apache
+
+- name: Configure Apache firewall rule
+  ansible.builtin.firewall:
+    port: "80/tcp"
+    state: enabled
+    permanent: yes
+  when: firewall_enabled | bool
+  ignore_errors: yes
+
+- name: Ensure Apache is running and enabled
+  ansible.builtin.service:
+    name: "{{ apache_service }}"
+    state: started
+    enabled: yes
+
+- name: Verify Apache is accessible
+  ansible.builtin.uri:
+    url: "http://{{ ansible_default_ipv4.address | default('127.0.0.1') }}"
+    status_code: 200
+    timeout: 10
+```
+
+**handlers/main.yml:**
+```yaml
+---
+- name: restart apache
+  ansible.builtin.service:
+    name: "{{ apache_service }}"
+    state: restarted
+```
+
+**Шаблон index.html.j2:**
+```html+jinja
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Системная информация</title>
+</head>
+<body>
+    <h1>Системная информация</h1>
+    <table>
+        <tr><th>Hostname</th><td>{{ ansible_hostname }}</td></tr>
+        <tr><th>IP-адрес</th><td>{{ ansible_default_ipv4.address }}</td></tr>
+        <tr><th>CPU</th><td>{{ ansible_processor_vcpus }} ядра</td></tr>
+        <tr><th>RAM</th><td>{{ (ansible_memtotal_mb / 1024) | round(2) }} GB</td></tr>
+        <tr><th>HDD</th><td>{{ ansible_devices.sda.size }}</td></tr>
+    </table>
+</body>
+</html>
+```
+
+**Выполнение плейбука:**
+```
+$ ansible-playbook -i inventory.ini playbook/playbook_webserver.yml
+
+PLAY [Deploy Apache web server with custom homepage] ***************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [webserver : Install Apache web server] ***********************************
+changed: [localhost]
+
+TASK [webserver : Create document root directory] ******************************
+ok: [localhost]
+
+TASK [webserver : Deploy index.html template] **********************************
+changed: [localhost]
+
+TASK [webserver : Ensure Apache is running and enabled] ************************
+changed: [localhost]
+
+TASK [webserver : Verify Apache is accessible] *********************************
+ok: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=5    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+**Архив с ролью:**
+```bash
+tar -czvf webserver-role.tar.gz roles/webserver/
+```
+
+![Проверка веб-страницы](img/webserver_result.png)
 
 ### Задание 4
 

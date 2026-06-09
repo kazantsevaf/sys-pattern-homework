@@ -1,10 +1,16 @@
 ---
-- name: Set custom MOTD
+- name: Set custom MOTD with system info
   hosts: localhost
   become: yes
   gather_facts: yes
   vars:
-    motd_message: "Welcome to my Ansible-managed server! | Host: {{ ansible_hostname }}"
+    motd_message: |
+      ========================================
+      IP-адрес: {{ ansible_default_ipv4.address | default('N/A') }}
+      Hostname: {{ ansible_hostname }}
+      
+      Доброго дня, системный администратор!
+      ========================================
   tasks:
     - name: Write custom MOTD
       ansible.builtin.copy:
