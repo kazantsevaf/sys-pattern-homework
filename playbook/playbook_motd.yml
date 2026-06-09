@@ -1,0 +1,16 @@
+---
+- name: Set custom MOTD
+  hosts: localhost
+  become: yes
+  gather_facts: yes
+  vars:
+    motd_message: "Welcome to my Ansible-managed server! | Host: {{ ansible_hostname }}"
+  tasks:
+    - name: Write custom MOTD
+      ansible.builtin.copy:
+        dest: /etc/motd
+        content: |
+          {{ motd_message }}
+        owner: root
+        group: root
+        mode: '0644'

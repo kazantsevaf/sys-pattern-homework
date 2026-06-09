@@ -1,4 +1,4 @@
-# Домашнее задание к занятию "`Название занятия`" - `Фамилия и имя студента`
+# Домашнее задание к занятию "`Ansible. Часть 2`" - `Казанцев Алексей Федорович`
 
 
 ### Инструкция по выполнению домашнего задания
@@ -24,25 +24,78 @@
 
 ### Задание 1
 
-`Приведите ответ в свободной форме........`
+`Реализованы три Ansible плейбука для выполнения заданных задач.`
 
-1. `Заполните здесь этапы выполнения, если требуется ....`
-2. `Заполните здесь этапы выполнения, если требуется ....`
-3. `Заполните здесь этапы выполнения, если требуется ....`
-4. `Заполните здесь этапы выполнения, если требуется ....`
-5. `Заполните здесь этапы выполнения, если требуется ....`
-6. 
+1. `playbook_archive.yml - Скачивает архив Apache Kafka и распаковывает его`
+2. `playbook_tuned.yml - Устанавливает пакет tuned, запускает и добавляет в автозагрузку`
+3. `playbook_motd.yml - Изменяет приветствие системы (MOTD) с использованием переменных`
 
+```bash
+# Создание inventory файла
+cat > inventory.ini << EOF
+[local]
+localhost ansible_connection=local
+EOF
+
+# Выполнение плейбука скачивания и распаковки архива
+ansible-playbook -i inventory.ini playbook/playbook_archive.yml
+
+# Выполнение плейбука установки tuned
+ansible-playbook -i inventory.ini playbook/playbook_tuned.yml
+
+# Выполнение плейбука настройки MOTD
+ansible-playbook -i inventory.ini playbook/playbook_motd.yml
 ```
-Поле для вставки кода...
-....
-....
-....
-....
+
+**Выполнение плейбука playbook_archive.yml:**
+```
+PLAY [Download and extract Apache Kafka] ***************************************
+
+TASK [Create destination directory] ********************************************
+changed: [localhost]
+
+TASK [Download Kafka archive] **************************************************
+changed: [localhost]
+
+TASK [Extract archive] *********************************************************
+changed: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=3    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота 1](ссылка на скриншот 1)`
+**Выполнение плейбука playbook_tuned.yml:**
+```
+PLAY [Install and enable tuned] ************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [Install tuned package] ***************************************************
+changed: [localhost]
+
+TASK [Start and enable tuned service] ******************************************
+changed: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=3    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+**Выполнение плейбука playbook_motd.yml:**
+```
+PLAY [Set custom MOTD] *********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [Write custom MOTD] *******************************************************
+changed: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+![Содержимое файла motd после выполнения](img/motd_result.png)
 
 
 ---
