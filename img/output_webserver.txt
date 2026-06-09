@@ -1,0 +1,44 @@
+
+PLAY [Deploy Apache web server with custom homepage] ***************************
+
+TASK [Gathering Facts] *********************************************************
+[WARNING]: Host 'localhost' is using the discovered Python interpreter at '/usr/bin/python3.14', but future installation of another Python interpreter could cause a different interpreter to be discovered. See https://docs.ansible.com/ansible-core/2.20/reference_appendices/interpreter_discovery.html for more information.
+ok: [localhost]
+
+TASK [../roles/webserver : Install Apache web server] **************************
+changed: [localhost]
+
+TASK [../roles/webserver : Create document root directory] *********************
+ok: [localhost]
+
+TASK [../roles/webserver : Deploy index.html template] *************************
+[WARNING]: Deprecation warnings can be disabled by setting `deprecation_warnings=False` in ansible.cfg.
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /home/aleksey/sys-pattern-homework/roles/webserver/templates/index.html.j2
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+changed: [localhost]
+
+TASK [../roles/webserver : Ensure Apache is running and enabled] ***************
+ok: [localhost]
+
+TASK [../roles/webserver : Verify Apache is accessible] ************************
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /home/aleksey/sys-pattern-homework/roles/webserver/tasks/main.yml:32:10
+
+30 - name: Verify Apache is accessible
+31   ansible.builtin.uri:
+32     url: "http://{{ ansible_default_ipv4.address | default('127.0.0.1') }}"
+            ^ column 10
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+ok: [localhost]
+
+RUNNING HANDLER [../roles/webserver : restart apache] **************************
+changed: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=7    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

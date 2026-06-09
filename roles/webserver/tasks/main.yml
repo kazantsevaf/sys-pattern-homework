@@ -21,14 +21,6 @@
     mode: '0644'
   notify: restart apache
 
-- name: Configure Apache firewall rule
-  ansible.builtin.firewall:
-    port: "80/tcp"
-    state: enabled
-    permanent: yes
-  when: firewall_enabled | bool
-  ignore_errors: yes
-
 - name: Ensure Apache is running and enabled
   ansible.builtin.service:
     name: "{{ apache_service }}"
